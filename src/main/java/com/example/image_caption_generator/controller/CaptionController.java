@@ -5,11 +5,8 @@ import com.example.image_caption_generator.service.GoogleGenerativeLanguageServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -17,6 +14,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 @RestController
+@RequestMapping("/api/v1/")
 public class CaptionController {
 
     @Autowired
@@ -27,15 +25,21 @@ public class CaptionController {
     @Value("${API_KEY}")
     private String API_KEY;
 
-    @PostMapping("/uploadImage")
-    public ResponseEntity<String> uploadImage(@RequestParam("file")MultipartFile file) {
-        System.out.println("Request reached!!");
+    @PostMapping("/caption")
+    public ResponseEntity<String> uploadImage(@RequestParam("image")MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood) {
+        System.out.println(platform +"  "+ mood);
         if(file.isEmpty()) {
             return ResponseEntity
-                    .badRequest()
+                    .status(HttpStatus.BAD_REQUEST)
                     .body("Please select a file to upload");
         }
+        if(platform.equals(null) || platform.isEmpty() || platform.isBlank()) {
+            platform = "Instagram";
+        }if(mood.equals(null) || mood.isEmpty() || mood.isBlank()) {
+            mood = "Funny";
+        }
         try{
+            System.out.println("Request is received");
             if(file.getSize() > MAX_FILE_SIZE) {
                 return ResponseEntity.badRequest().body("File size exceeded the maximum size limit of 100MB");
             }
@@ -44,8 +48,8 @@ public class CaptionController {
             String base64EncodedImage = Base64.getEncoder().encodeToString(bytes);
             if(!base64EncodedImage.isEmpty()) {
                 System.out.println("Image encoded to Base64 successfully!");
-                String captions = googleGenerativeLanguageService
-                        .generateCaption(base64EncodedImage, "This is a picture that I want to upload on instagram. Can you suggest some funny caption ideas along with trending hashtags?");
+                String response = googleGenerativeLanguageService
+                        .generateCaption(base64EncodedImage, "This is a picture that I want to upload on "+platform+". Can you suggest some "+mood+" caption ideas along with trending hashtags? Please send the response in JSON format.");
 
                 // Delete the uploaded file after processing
                 File tempFile = File.createTempFile("uploaded-file-", ".tmp");
@@ -54,7 +58,7 @@ public class CaptionController {
                     System.err.println("Failed to delete temporary file: " + tempFile.getAbsolutePath());
                 }
                 System.out.println("File is deleted successfully!");
-                return ResponseEntity.ok().body(captions);
+                return ResponseEntity.ok().body(response);
             } else {
 
                 System.out.println("Failed to encode image to Base64!");
