@@ -5,8 +5,10 @@ import com.example.image_caption_generator.dto.geminiRequest.Content;
 import com.example.image_caption_generator.dto.geminiRequest.ContentRequest;
 import com.example.image_caption_generator.dto.geminiRequest.InlineData;
 import com.example.image_caption_generator.dto.geminiRequest.Part;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,9 +23,13 @@ public class GoogleGenerativeLanguageService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={apiKey}";
+    @Value("${API_KEY}")
+    private String API_KEY;
 
-    public String generateCaption(String API_KEY, String base64EncodedImage, String text) {
+    @Value("${API_URL}")
+    private String API_URL;
+
+    public String generateCaption(String base64EncodedImage, String text) {
         // Create the request JSON structure
         ContentRequest contentRequest = new ContentRequest();
         Content content = new Content();
@@ -52,12 +58,49 @@ public class GoogleGenerativeLanguageService {
             ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class, API_KEY);
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                return response.getBody();
+                String responseBody = response.getBody();
+                String extractedText = extractTextFromResponse(responseBody);
+                return  extractedText;
             } else {
                 throw new RuntimeException("Failed to call API: " + response.getStatusCode());
             }
         } catch (Exception e) {
             throw new RuntimeException("Error creating request JSON", e);
+        }
+    }
+
+
+    private String extractTextFromResponse(String responseString) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            // Parse the response string into a JsonNode
+            JsonNode rootNode = mapper.readTree(responseString);
+
+            // Get the "candidates" array
+            JsonNode candidatesArray = rootNode.get("candidates");
+
+            // Get the first candidate (assuming there's only one candidate in the array)
+            JsonNode firstCandidate = candidatesArray.get(0);
+
+            // Get the "content" object
+            JsonNode contentObject = firstCandidate.get("content");
+
+            // Get the "parts" array
+            JsonNode partsArray = contentObject.get("parts");
+
+            // Initialize a StringBuilder to store the extracted text
+            StringBuilder extractedText = new StringBuilder();
+
+            // Iterate through the "parts" array and append the text to the StringBuilder
+            for (JsonNode partNode : partsArray) {
+                String text = partNode.get("text").asText();
+                extractedText.append(text).append("\n");
+            }
+
+            // Extracted text as a string
+            return extractedText.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Error extracting text from response", e);
         }
     }
 }

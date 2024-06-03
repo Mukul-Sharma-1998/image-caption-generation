@@ -3,6 +3,7 @@ package com.example.image_caption_generator.controller;
 
 import com.example.image_caption_generator.service.GoogleGenerativeLanguageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ public class CaptionController {
 
     private static final long MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
+    @Value("${API_KEY}")
+    private String API_KEY;
+
     @PostMapping("/uploadImage")
     public ResponseEntity<String> uploadImage(@RequestParam("file")MultipartFile file) {
         System.out.println("Request reached!!");
@@ -41,7 +45,7 @@ public class CaptionController {
             if(!base64EncodedImage.isEmpty()) {
                 System.out.println("Image encoded to Base64 successfully!");
                 String captions = googleGenerativeLanguageService
-                        .generateCaption("asdfgh", base64EncodedImage, "This is a picture that I want to upload on instagram. Can you suggest some funny caption ideas along with trending hashtags?");
+                        .generateCaption(base64EncodedImage, "This is a picture that I want to upload on instagram. Can you suggest some funny caption ideas along with trending hashtags?");
 
                 // Delete the uploaded file after processing
                 File tempFile = File.createTempFile("uploaded-file-", ".tmp");
