@@ -26,7 +26,7 @@ public class CaptionController {
     private String API_KEY;
 
     @PostMapping("/caption")
-    public ResponseEntity<String> uploadImage(@RequestParam("image")MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood) {
+    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood) {
         System.out.println(platform +"  "+ mood);
         if(file.isEmpty()) {
             return ResponseEntity
@@ -58,6 +58,7 @@ public class CaptionController {
                     System.err.println("Failed to delete temporary file: " + tempFile.getAbsolutePath());
                 }
                 System.out.println("File is deleted successfully!");
+                System.out.println(response);
                 return ResponseEntity.ok().body(response);
             } else {
 

@@ -5,7 +5,6 @@ import com.example.image_caption_generator.dto.geminiRequest.Content;
 import com.example.image_caption_generator.dto.geminiRequest.ContentRequest;
 import com.example.image_caption_generator.dto.geminiRequest.InlineData;
 import com.example.image_caption_generator.dto.geminiRequest.Part;
-import com.example.image_caption_generator.dto.geminiResponse.GeminiResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +59,7 @@ public class GoogleGenerativeLanguageService {
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 String responseBody = response.getBody();
-//                System.out.println(responseBody);
                 String extractedText = extractTextFromResponse(responseBody);
-//                System.out.println(extractedText);
-//                GeminiResponse apiResponse = objectMapper.readValue(extractedText, GeminiResponse.class);
                 return extractedText;
 
             } else {
@@ -112,17 +108,17 @@ public class GoogleGenerativeLanguageService {
         }
     }
 
-    private String formatResponse(GeminiResponse apiResponse) {
-        // Format the response as per your requirements
-        StringBuilder formattedResponse = new StringBuilder();
-        formattedResponse.append("Captions:\n");
-        for (String caption : apiResponse.getCaptions()) {
-            formattedResponse.append("- ").append(caption).append("\n");
-        }
-        formattedResponse.append("\nHashtags:\n");
-        for (String hashtag : apiResponse.getHashtags()) {
-            formattedResponse.append("#").append(hashtag).append(" ");
-        }
-        return formattedResponse.toString();
-    }
+//    private String formatResponse(GeminiResponse apiResponse) {
+//        // Format the response as per your requirements
+//        StringBuilder formattedResponse = new StringBuilder();
+//        formattedResponse.append("Captions:\n");
+//        for (String caption : apiResponse.getCaptions()) {
+//            formattedResponse.append("- ").append(caption).append("\n");
+//        }
+//        formattedResponse.append("\nHashtags:\n");
+//        for (String hashtag : apiResponse.getHashtags()) {
+//            formattedResponse.append("#").append(hashtag).append(" ");
+//        }
+//        return formattedResponse.toString();
+//    }
 }
