@@ -14,6 +14,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("https://maxted.xyz");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
@@ -22,4 +23,5 @@ public class CorsConfig {
 
         return new CorsFilter(source);
     }
+
 }

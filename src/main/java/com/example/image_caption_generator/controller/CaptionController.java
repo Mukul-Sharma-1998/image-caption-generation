@@ -27,7 +27,6 @@ public class CaptionController {
 
     @PostMapping("/caption")
     public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood) {
-        System.out.println(platform +"  "+ mood);
         if(file.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -39,15 +38,12 @@ public class CaptionController {
             mood = "Funny";
         }
         try{
-            System.out.println("Request is received");
             if(file.getSize() > MAX_FILE_SIZE) {
                 return ResponseEntity.badRequest().body("File size exceeded the maximum size limit of 100MB");
             }
             byte[] bytes = file.getBytes();
-            System.out.println("file uploaded successfully!");
             String base64EncodedImage = Base64.getEncoder().encodeToString(bytes);
             if(!base64EncodedImage.isEmpty()) {
-                System.out.println("Image encoded to Base64 successfully!");
                 String response = googleGenerativeLanguageService
                         .generateCaption(base64EncodedImage, "This is a picture that I want to upload on "+platform+". Can you suggest some "+mood+" caption ideas along with trending hashtags? Please send the response in JSON format.");
 
@@ -57,12 +53,9 @@ public class CaptionController {
                 if (!tempFile.delete()) {
                     System.err.println("Failed to delete temporary file: " + tempFile.getAbsolutePath());
                 }
-                System.out.println("File is deleted successfully!");
-                System.out.println(response);
                 return ResponseEntity.ok().body(response);
             } else {
 
-                System.out.println("Failed to encode image to Base64!");
                 return ResponseEntity.badRequest().body("Failed to encode your file!");
             }
 
