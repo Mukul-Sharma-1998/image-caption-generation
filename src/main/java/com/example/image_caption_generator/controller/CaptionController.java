@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +27,7 @@ public class CaptionController {
     @Value("${API_KEY}")
     private String API_KEY;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/caption")
     public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood) {
         if(file.isEmpty()) {
