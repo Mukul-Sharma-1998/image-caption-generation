@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Base64;
 
 @RestController
@@ -29,7 +30,8 @@ public class CaptionController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/caption")
-    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood) {
+    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood, Principal principal) {
+        System.out.println(principal);
         if(file.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
