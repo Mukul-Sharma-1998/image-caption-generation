@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class GoogleGenerativeLanguageService {
+public class GoogleGenerativeLanguageService implements GenerativeLanguageService {
 
     @Autowired
     private RestTemplate restTemplate;

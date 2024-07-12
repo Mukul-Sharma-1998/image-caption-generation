@@ -28,7 +28,7 @@ public class CaptionController {
     @Value("${API_KEY}")
     private String API_KEY;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/caption")
     public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("platform") String platform, @RequestParam("mood") String mood, Principal principal) {
         System.out.println(principal);
